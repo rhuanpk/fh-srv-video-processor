@@ -15,3 +15,4 @@ Execução:
 
 ToDo:
 - [ ] Realizar teste de carga com vídeos grandes
+- [ ] Implementar algum padrão de arquitetura
