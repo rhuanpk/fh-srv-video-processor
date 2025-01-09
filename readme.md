@@ -12,3 +12,6 @@ Execução:
 	`go mod tidy`
 1. Execute o programa:
 	`go run ./`
+
+ToDo:
+- [ ] Realizar teste de carga com vídeos grandes
