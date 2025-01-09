@@ -14,5 +14,6 @@ Execução:
 	`go run ./`
 
 ToDo:
+- [x] Criar MVP do serviço
 - [ ] Realizar teste de carga com vídeos grandes
 - [ ] Implementar algum padrão de arquitetura
