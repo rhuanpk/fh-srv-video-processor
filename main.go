@@ -33,6 +33,7 @@ func extractFrames(videoPath, outputDir string, frameInterval int, highQuality b
 
 	err := ffmpeg.Input(videoPath).
 		Output(filepath.Join(outputDir, strings.Replace(frameName, "*", "%04d", 1)), kwArgs).
+		// OverWriteOutput().RunWithResource(0.75, 1.0)
 		OverWriteOutput().Run()
 	if err != nil {
 		return err
