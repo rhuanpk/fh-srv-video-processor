@@ -13,20 +13,25 @@ import (
 )
 
 const (
-	frameName     = "frame_*.png"
+	frameName        = "frame_*.png"
+	frameHighQuality = 1
+
 	videoPath     = "video/sample.mp4"
 	frameInterval = 1
 )
 
-func extractFrames(videoPath, outputDir string, frameInterval int) error {
+func extractFrames(videoPath, outputDir string, frameInterval int, highQuality bool) error {
 	if err := os.MkdirAll(outputDir, os.ModePerm); err != nil {
 		return err
 	}
 
+	kwArgs := ffmpeg.KwArgs{"vf": fmt.Sprintf("fps=1/%d", frameInterval)}
+	if highQuality {
+		kwArgs["q:v"] = frameHighQuality
+	}
+
 	err := ffmpeg.Input(videoPath).
-		Output(
-			filepath.Join(outputDir, strings.Replace(frameName, "*", "%04d", 1)),
-			ffmpeg.KwArgs{"vf": fmt.Sprintf("fps=1/%d", frameInterval)}).
+		Output(filepath.Join(outputDir, strings.Replace(frameName, "*", "%04d", 1)), kwArgs).
 		OverWriteOutput().Run()
 	if err != nil {
 		return err
@@ -79,7 +84,7 @@ func createZip(zipPath, sourceDir string) error {
 	return nil
 }
 
-func processVideo(videoPath string, frameInterval int) (string, error) {
+func processVideo(videoPath string, frameInterval int, highQuality bool) (string, error) {
 	videoDir := filepath.Dir(videoPath)
 
 	framesDir := filepath.Join(videoDir, "frames")
@@ -97,7 +102,7 @@ func processVideo(videoPath string, frameInterval int) (string, error) {
 	zipName := strings.TrimSuffix(videoName, filepath.Ext(videoName)) + "_frames.zip"
 	zipPath := filepath.Join(videoDir, zipName)
 
-	if err := extractFrames(videoPath, framesDir, frameInterval); err != nil {
+	if err := extractFrames(videoPath, framesDir, frameInterval, highQuality); err != nil {
 		return "", err
 	}
 
@@ -109,7 +114,7 @@ func processVideo(videoPath string, frameInterval int) (string, error) {
 }
 
 func main() {
-	zipPath, err := processVideo(videoPath, frameInterval)
+	zipPath, err := processVideo(videoPath, frameInterval, false)
 	if err != nil {
 		log.Println("error in process video:", err)
 		return
