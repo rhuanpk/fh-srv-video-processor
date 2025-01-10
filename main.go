@@ -119,7 +119,7 @@ func main() {
 		log.Println("execution time:", time.Since(start).String())
 	}(time.Now())
 
-	zipPath, err := processVideo(videoPath, frameInterval, false)
+	zipPath, err := processVideo(videoPath, frameInterval, true)
 	if err != nil {
 		log.Println("error in process video:", err)
 		return
