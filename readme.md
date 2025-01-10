@@ -17,3 +17,4 @@ ToDo:
 - [x] Criar MVP do serviço
 - [ ] Realizar teste de carga com vídeos grandes
 - [ ] Implementar algum padrão de arquitetura
+- [ ] Realizar mais de um processamento por vez
