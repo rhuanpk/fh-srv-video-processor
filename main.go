@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 )
@@ -114,6 +115,10 @@ func processVideo(videoPath string, frameInterval int, highQuality bool) (string
 }
 
 func main() {
+	defer func(start time.Time) {
+		log.Println("execution time:", time.Since(start).String())
+	}(time.Now())
+
 	zipPath, err := processVideo(videoPath, frameInterval, false)
 	if err != nil {
 		log.Println("error in process video:", err)
