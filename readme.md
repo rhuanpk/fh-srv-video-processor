@@ -15,6 +15,6 @@ Execução:
 
 ToDo:
 - [x] Criar MVP do serviço
-- [ ] Realizar teste de carga com vídeos grandes
+- [x] Realizar teste de carga com vídeos grandes
 - [ ] Implementar algum padrão de arquitetura
-- [ ] Realizar mais de um processamento por vez
+- [X] Realizar mais de um processamento por vez
