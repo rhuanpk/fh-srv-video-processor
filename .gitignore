@@ -1,7 +1,10 @@
 go.sum
+tmp/
 
 *.jpg
 *.jpeg
 *.png
 *.mp4
 *.zip
+
+.air.toml
