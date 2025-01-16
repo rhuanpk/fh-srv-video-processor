@@ -19,3 +19,4 @@ ToDo:
 - [ ] Implementar algum padrão de arquitetura
 - [X] Realizar mais de um processamento por vez
 - [ ] Implementar integração com AWS
+- [ ] Implementar limitador de goroutines
