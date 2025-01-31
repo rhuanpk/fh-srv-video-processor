@@ -16,7 +16,7 @@ Execução:
 ToDo:
 - [x] Criar MVP do serviço
 - [x] Realizar teste de carga com vídeos grandes
-- [ ] Implementar algum padrão de arquitetura
+- [x] Implementar algum padrão de arquitetura
 - [X] Realizar mais de um processamento por vez
 - [ ] Implementar integração com AWS
 - [ ] Implementar limitador de goroutines
