@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"extractor/internal/config"
-	"extractor/internal/resouce/processor"
+	"extractor/internal/resouce/video"
 	"extractor/internal/resouce/zipper"
 
 	ffmpeg "github.com/u2takey/ffmpeg-go"
@@ -21,7 +21,7 @@ type service struct {
 	zip zipper.Service
 }
 
-func NewService(zip zipper.Service) processor.Service {
+func NewService(zip zipper.Service) video.Service {
 	return &service{zip: zip}
 }
 
@@ -36,7 +36,7 @@ func extractFrames(videosPaths, outputsDirs []string, frameInterval int, highQua
 
 	kwArgs := ffmpeg.KwArgs{"vf": fmt.Sprintf("fps=1/%d", frameInterval)}
 	if highQuality {
-		kwArgs["q:v"] = config.FrameHighQuality
+		kwArgs["q:v"] = config.FrameHighQualityParam
 	}
 
 	var wg sync.WaitGroup

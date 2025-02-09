@@ -1,9 +1,9 @@
-package processor
+package video
 
 import "net/http"
 
 type Service interface {
-	Process([]string, int, bool) ([]string, error)
+	Process(videosPaths []string, frameInterval int, highQuality bool) ([]string, error)
 }
 
 type Controller interface {
