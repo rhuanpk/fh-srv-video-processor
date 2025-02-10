@@ -22,3 +22,11 @@ ToDo:
 - [x] Realizar do serviço de status
 - [ ] Implementar limitador de goroutines
 - [x] Add GitHub Actions
+
+# Workflow de CI/CD
+
+Este projeto utiliza o GitHub Actions para automação do pipeline de CI/CD. O workflow realiza as seguintes etapas:
+
+1. Configuração do ambiente Docker: Habilita o suporte ao QEMU e configura o Buildx para builds otimizados.
+2. Autenticação no Docker Hub: Realiza login no Docker Hub utilizando credenciais seguras.
+3. Criação e Envio da Imagem Docker: O código é empacotado em uma imagem Docker e enviado para o Docker Hub. Para mais detalhes, consulte o arquivo .github/workflows/deploy.yml
