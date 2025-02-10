@@ -13,4 +13,5 @@ RUN go build -o /main ./
 FROM alpine
 WORKDIR /app
 COPY --from=0 /main ./
+RUN apk update && apk add ffmpeg
 CMD [ "/app/main" ]
