@@ -6,13 +6,17 @@ import (
 	"net/http"
 )
 
-func Post(url, contentType string, body any) error {
+func Put(url, contentType string, body any) error {
 	marshaled, err := json.Marshal(body)
 	if err != nil {
 		return err
 	}
 
-	if _, err := http.Post(url, contentType, bytes.NewReader(marshaled)); err != nil {
+	request, err := http.NewRequest(http.MethodPut, url, bytes.NewReader(marshaled))
+	if err != nil {
+		return err
+	}
+	if _, err := new(http.Client).Do(request); err != nil {
 		return err
 	}
 
