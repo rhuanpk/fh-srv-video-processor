@@ -18,5 +18,6 @@ ToDo:
 - [x] Realizar teste de carga com vídeos grandes
 - [x] Implementar algum padrão de arquitetura
 - [X] Realizar mais de um processamento por vez
-- [ ] Implementar integração com AWS
+- [x] Implementar integração com AWS
+- [x] Realizar do serviço de status
 - [ ] Implementar limitador de goroutines
