@@ -8,6 +8,7 @@ RUN go mod verify
 COPY main.go ./
 COPY internal/ internal/
 COPY pkg/ pkg/
+RUN go mod tidy
 RUN go build -o /main ./
 
 FROM alpine
