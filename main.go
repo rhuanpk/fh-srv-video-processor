@@ -54,6 +54,8 @@ func main() {
 					log.Println("download objects:", shortSuffix)
 				}
 
+				// call srv status antes
+
 				service := video.NewService(zipper.NewService())
 				zipsPaths, err := service.Process(videosPaths, config.FrameInterval, config.FrameHighQuality)
 				if err != nil {
@@ -70,15 +72,19 @@ func main() {
 					zipPathBase := filepath.Base(zipPath)
 					s3FileName := filepath.Join(filepath.Dir(unescapedKey), zipPathBase)
 
-					if err := s3.UploadObject(record.S3.Bucket.Name, s3FileName, zipPath); err != nil {
+					objPublicLink, err := s3.UploadObject(record.S3.Bucket.Name, s3FileName, zipPath)
+					if err != nil {
 						log.Println("error in upload object:", err)
 						continue
 					}
 					log.Println("upload object:", zipPathBase)
+					log.Println("object public link:", objPublicLink)
 				}
 			}
 
-			// call srv status
+			// call srv status depois
+
+			// call aws sns
 
 			if err := os.RemoveAll(config.ExtractorFolderTmp); err != nil {
 				log.Println("error in remove tmp folder:", err)

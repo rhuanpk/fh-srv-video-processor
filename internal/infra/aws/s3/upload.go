@@ -2,6 +2,8 @@ package s3
 
 import (
 	"context"
+	"extractor/internal/config"
+	"fmt"
 	"os"
 	"time"
 
@@ -9,34 +11,34 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
-func UploadObject(bucketName, objKey, filePath string) error {
+func UploadObject(bucketName, objKey, filePath string) (string, error) {
 	client, err := getClient()
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	file, err := os.Open(filePath)
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer file.Close()
 
-	_, err = client.PutObject(context.Background(), &s3.PutObjectInput{
+	if _, err := client.PutObject(context.Background(), &s3.PutObjectInput{
 		Bucket: aws.String(bucketName),
 		Key:    aws.String(objKey),
 		Body:   file,
-	})
-	if err != nil {
-		return err
+		// ACL:    types.ObjectCannedACLPublicRead,
+	}); err != nil {
+		return "", err
 	}
 
-	err = s3.NewObjectExistsWaiter(client).Wait(context.Background(), &s3.HeadObjectInput{
+	if err = s3.NewObjectExistsWaiter(client).Wait(context.Background(), &s3.HeadObjectInput{
 		Bucket: aws.String(bucketName),
 		Key:    aws.String(objKey),
-	}, time.Minute)
-	if err != nil {
-		return err
+	}, time.Minute); err != nil {
+		return "", err
 	}
 
-	return nil
+	publicLink := fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s", bucketName, config.AWSRegion, objKey)
+	return publicLink, nil
 }
