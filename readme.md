@@ -21,3 +21,4 @@ ToDo:
 - [x] Implementar integração com AWS
 - [x] Realizar do serviço de status
 - [ ] Implementar limitador de goroutines
+- [x] Add GitHub Actions
