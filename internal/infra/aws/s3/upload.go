@@ -40,6 +40,6 @@ func UploadObject(bucketName, objKey, filePath string) (string, error) {
 		return "", err
 	}
 
-	publicLink := fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s", bucketName, config.AWSRegion, objKey)
+	publicLink := fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s", bucketName, config.AWSDefaultRegion, objKey)
 	return publicLink, nil
 }
