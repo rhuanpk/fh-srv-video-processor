@@ -83,7 +83,7 @@ func main() {
 					unescapedKey, err := url.PathUnescape(record.S3.Object.Key)
 					if err != nil {
 						log.Println("error in unescape object key:", err)
-						continue messagesLoop
+						continue
 					}
 					zipPathBase := filepath.Base(zipPath)
 					s3FileName := filepath.Join(filepath.Dir(unescapedKey), zipPathBase)
@@ -107,7 +107,7 @@ func main() {
 				snsTopicID, err := sns.Publish(regexp.MustCompile(`[[:punct:]]`).ReplaceAllString(objMetadata.UserEmail, "_"), objPublicLink)
 				if err != nil {
 					log.Println("error in publish sns topic:", err)
-					continue messagesLoop
+					continue
 				}
 
 				log.Println("send sns topic message:", snsTopicID)
