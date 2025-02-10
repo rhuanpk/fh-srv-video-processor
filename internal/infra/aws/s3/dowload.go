@@ -41,17 +41,17 @@ func listObjectsPaginator(client s3.ListObjectsV2APIClient, bucketName, pathSuff
 	return objKeys, nil
 }
 
-func DownloadObjects(bucketName, pathSuffix string) (string, []string, error) {
+func DownloadObjects(bucketName, pathSuffix string) ([]string, error) {
 	var videosPaths []string
 
 	client, err := getClient()
 	if err != nil {
-		return "", nil, err
+		return nil, err
 	}
 
 	objKeys, err := listObjectsPaginator(client, bucketName, pathSuffix)
 	if err != nil {
-		return "", nil, err
+		return nil, err
 	}
 
 	for _, objKey := range objKeys {
@@ -64,7 +64,7 @@ func DownloadObjects(bucketName, pathSuffix string) (string, []string, error) {
 
 		file, err := os.Create(videoName)
 		if err != nil {
-			return "", nil, err
+			return nil, err
 		}
 		defer file.Close()
 
@@ -72,9 +72,9 @@ func DownloadObjects(bucketName, pathSuffix string) (string, []string, error) {
 			Bucket: aws.String(bucketName),
 			Key:    aws.String(objKey),
 		}); err != nil {
-			return "", nil, err
+			return nil, err
 		}
 	}
 
-	return strings.TrimPrefix(pathSuffix, "videos/"), videosPaths, nil
+	return videosPaths, nil
 }

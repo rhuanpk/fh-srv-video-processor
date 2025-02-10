@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"time"
 
 	"extractor/internal/config"
@@ -52,7 +53,7 @@ func main() {
 			}
 
 			for _, record := range body.Records {
-				shortSuffix, videosPaths, err := s3.DownloadObjects(record.S3.Bucket.Name, record.S3.Object.Key)
+				videosPaths, err := s3.DownloadObjects(record.S3.Bucket.Name, record.S3.Object.Key)
 				if err != nil {
 					log.Println("error in dowload object:", err)
 					continue
@@ -60,7 +61,7 @@ func main() {
 				if len(videosPaths) <= 0 {
 					continue
 				}
-				log.Println("download objects:", shortSuffix)
+				log.Println("download objects:", strings.TrimPrefix(record.S3.Object.Key, "videos/"))
 
 				// call srv status antes
 
