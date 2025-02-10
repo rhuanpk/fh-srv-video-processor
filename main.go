@@ -16,6 +16,7 @@ import (
 	"extractor/internal/infra/aws/sqs"
 	video "extractor/internal/resouce/video/handler"
 	zipper "extractor/internal/resouce/zipper/handler"
+	"extractor/pkg/request"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 )
@@ -63,7 +64,12 @@ func main() {
 				}
 				log.Println("download objects:", strings.TrimPrefix(record.S3.Object.Key, "videos/"))
 
-				// call srv status antes
+				if err := request.Post(config.APISrvStatusURL, "application/json", map[string]any{
+					"id":     objMetadata.VideoID,
+					"status": "EM_PROCESSAMENTO",
+				}); err != nil {
+					log.Println("error in request status service:", err)
+				}
 
 				zipsPaths, err := service.Process(videosPaths, config.FrameInterval, config.FrameHighQuality)
 				if err != nil {
@@ -90,7 +96,12 @@ func main() {
 					log.Println("object public link:", objPublicLink)
 				}
 
-				// call srv status depois
+				if err := request.Post(config.APISrvStatusURL, "application/json", map[string]any{
+					"id":     objMetadata.VideoID,
+					"status": "FINALIZADO",
+				}); err != nil {
+					log.Println("error in request status service:", err)
+				}
 
 				snsTopicID, err := sns.Publish(regexp.MustCompile(`[[:punct:]]`).ReplaceAllString(objMetadata.UserEmail, "_"), objPublicLink)
 				if err != nil {

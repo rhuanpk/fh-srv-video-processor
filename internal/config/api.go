@@ -1,6 +1,9 @@
 package config
 
-import "strconv"
+import (
+	"os"
+	"strconv"
+)
 
 type api int
 
@@ -13,3 +16,5 @@ func (a api) ToString() string {
 func (a api) Parse() string {
 	return ":" + a.ToString()
 }
+
+var APISrvStatusURL = os.Getenv("API_SRV_STATUS_URL")
