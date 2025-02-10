@@ -1,0 +1,15 @@
+services:
+
+  api:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    environment:
+      AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+      AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+      AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+      AWS_SESSION_TOKEN: $AWS_SESSION_TOKEN
+      AWS_SQS_QUEUE_NAME: $AWS_SQS_QUEUE_NAME
+      AWS_SNS_ARN_PREFIX: $AWS_SNS_ARN_PREFIX
+      API_SRV_STATUS_URL: $API_SRV_STATUS_URL
+    restart: on-failure:5

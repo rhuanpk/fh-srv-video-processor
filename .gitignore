@@ -1,5 +1,5 @@
 go.sum
-tmp/
+.env
 
 *.jpg
 *.jpeg
@@ -8,3 +8,4 @@ tmp/
 *.zip
 
 .air.toml
+tmp/
