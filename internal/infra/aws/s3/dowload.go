@@ -2,6 +2,7 @@ package s3
 
 import (
 	"context"
+	"io"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -10,7 +11,6 @@ import (
 	"extractor/internal/config"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
@@ -41,19 +41,20 @@ func listObjectsPaginator(client s3.ListObjectsV2APIClient, bucketName, pathSuff
 	return objKeys, nil
 }
 
-func DownloadObjects(bucketName, pathSuffix string) ([]string, error) {
+func DownloadObjects(bucketName, pathSuffix string) (*objectMetadata, []string, error) {
 	var videosPaths []string
 
 	client, err := getClient()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	objKeys, err := listObjectsPaginator(client, bucketName, pathSuffix)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
+	var obj *s3.GetObjectOutput
 	for _, objKey := range objKeys {
 		if !strings.Contains(config.VideoExtensions, filepath.Ext(objKey)) {
 			continue
@@ -62,19 +63,28 @@ func DownloadObjects(bucketName, pathSuffix string) ([]string, error) {
 		videoName := filepath.Join(config.ExtractorFolderTmp, filepath.Base(objKey))
 		videosPaths = append(videosPaths, videoName)
 
+		obj, err = client.GetObject(context.Background(), &s3.GetObjectInput{
+			Bucket: aws.String(bucketName),
+			Key:    aws.String(objKey),
+		})
+		if err != nil {
+			return nil, nil, err
+		}
+		defer obj.Body.Close()
+
 		file, err := os.Create(videoName)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		defer file.Close()
 
-		if _, err := manager.NewDownloader(client).Download(context.Background(), file, &s3.GetObjectInput{
-			Bucket: aws.String(bucketName),
-			Key:    aws.String(objKey),
-		}); err != nil {
-			return nil, err
+		if _, err := io.Copy(file, obj.Body); err != nil {
+			return nil, nil, err
 		}
 	}
 
-	return videosPaths, nil
+	return &objectMetadata{
+		UserEmail: obj.Metadata["x-amz-meta-email"],
+		VideoID:   obj.Metadata["x-amz-meta-id"],
+	}, videosPaths, nil
 }

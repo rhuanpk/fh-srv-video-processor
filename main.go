@@ -53,7 +53,7 @@ func main() {
 			}
 
 			for _, record := range body.Records {
-				videosPaths, err := s3.DownloadObjects(record.S3.Bucket.Name, record.S3.Object.Key)
+				objMetadata, videosPaths, err := s3.DownloadObjects(record.S3.Bucket.Name, record.S3.Object.Key)
 				if err != nil {
 					log.Println("error in dowload object:", err)
 					continue
@@ -92,8 +92,7 @@ func main() {
 
 				// call srv status depois
 
-				email := regexp.MustCompile(`=(.*)$`).FindStringSubmatch(record.UserIdentity.PrincipalID)[1]
-				snsTopicID, err := sns.Publish(regexp.MustCompile(`[[:punct:]]`).ReplaceAllString(email, "_"), objPublicLink)
+				snsTopicID, err := sns.Publish(regexp.MustCompile(`[[:punct:]]`).ReplaceAllString(objMetadata.UserEmail, "_"), objPublicLink)
 				if err != nil {
 					log.Println("error in publish sns topic:", err)
 					continue
