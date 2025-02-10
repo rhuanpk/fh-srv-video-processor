@@ -2,10 +2,11 @@ package s3
 
 import (
 	"context"
-	"extractor/internal/config"
 	"fmt"
 	"os"
 	"time"
+
+	"extractor/internal/config"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"

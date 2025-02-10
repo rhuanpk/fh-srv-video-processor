@@ -24,11 +24,6 @@ import (
 func main() {
 	service := video.NewService(zipper.NewService())
 
-	// REMOVE
-	config.AWSRegion = "us-east-1"
-	config.AWSSQSQueueName = "hack-sqs-queue"
-	config.AWSSNSArnPrefix = "arn:aws:sns:us-east-1:086085977965"
-
 	for {
 		log.Println("pulling for aws sqs messages")
 
