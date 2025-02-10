@@ -57,9 +57,10 @@ func main() {
 					log.Println("error in dowload object:", err)
 					continue
 				}
-				if len(videosPaths) > 0 {
-					log.Println("download objects:", shortSuffix)
+				if len(videosPaths) <= 0 {
+					continue
 				}
+				log.Println("download objects:", shortSuffix)
 
 				// call srv status antes
 
@@ -91,7 +92,13 @@ func main() {
 				// call srv status depois
 
 				email := regexp.MustCompile(`=(.*)$`).FindStringSubmatch(record.UserIdentity.PrincipalID)[1]
-				sns.Publish(regexp.MustCompile(`[[:punct:]]`).ReplaceAllString(email, "_"), objPublicLink)
+				snsTopicID, err := sns.Publish(regexp.MustCompile(`[[:punct:]]`).ReplaceAllString(email, "_"), objPublicLink)
+				if err != nil {
+					log.Println("error in publish sns topic:", err)
+					continue
+				}
+
+				log.Println("send sns topic message:", snsTopicID)
 			}
 
 			if err := os.RemoveAll(config.ExtractorFolderTmp); err != nil {
