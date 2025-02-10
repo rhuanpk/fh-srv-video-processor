@@ -42,7 +42,10 @@ func listObjectsPaginator(client s3.ListObjectsV2APIClient, bucketName, pathSuff
 }
 
 func DownloadObjects(bucketName, pathSuffix string) (*objectMetadata, []string, error) {
-	var videosPaths []string
+	var (
+		objectMetadata objectMetadata
+		videosPaths    []string
+	)
 
 	client, err := getClient()
 	if err != nil {
@@ -83,8 +86,10 @@ func DownloadObjects(bucketName, pathSuffix string) (*objectMetadata, []string, 
 		}
 	}
 
-	return &objectMetadata{
-		UserEmail: obj.Metadata["x-amz-meta-email"],
-		VideoID:   obj.Metadata["x-amz-meta-id"],
-	}, videosPaths, nil
+	if obj != nil {
+		objectMetadata.UserEmail = obj.Metadata["x-amz-meta-email"]
+		objectMetadata.VideoID = obj.Metadata["x-amz-meta-id"]
+	}
+
+	return &objectMetadata, videosPaths, nil
 }

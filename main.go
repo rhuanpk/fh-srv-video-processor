@@ -36,6 +36,7 @@ func main() {
 			log.Println("retrieved", len(messages), "messages")
 		}
 
+	messagesLoop:
 		for _, message := range messages {
 			var body sqs.Event
 			if err := json.Unmarshal([]byte(*message.Body), &body); err != nil {
@@ -52,10 +53,15 @@ func main() {
 				objMetadata, videosPaths, err := s3.DownloadObjects(record.S3.Bucket.Name, record.S3.Object.Key)
 				if err != nil {
 					log.Println("error in dowload object:", err)
-					continue
+					continue messagesLoop
 				}
 				if len(videosPaths) <= 0 {
-					continue
+					if err := sqs.DeleteMessage(queueURL, aws.ToString(message.ReceiptHandle)); err != nil {
+						log.Println("error in delete message:", err)
+						continue
+					}
+					log.Println("delete message:", aws.ToString(message.MessageId))
+					continue messagesLoop
 				}
 				log.Println("download objects:", strings.TrimPrefix(record.S3.Object.Key, "videos/"))
 
@@ -69,7 +75,7 @@ func main() {
 				zipsPaths, err := service.Process(videosPaths, config.FrameInterval, config.FrameHighQuality)
 				if err != nil {
 					log.Println("error in process videos:", err)
-					continue
+					continue messagesLoop
 				}
 
 				var objPublicLink string
@@ -77,7 +83,7 @@ func main() {
 					unescapedKey, err := url.PathUnescape(record.S3.Object.Key)
 					if err != nil {
 						log.Println("error in unescape object key:", err)
-						continue
+						continue messagesLoop
 					}
 					zipPathBase := filepath.Base(zipPath)
 					s3FileName := filepath.Join(filepath.Dir(unescapedKey), zipPathBase)
@@ -85,7 +91,7 @@ func main() {
 					objPublicLink, err = s3.UploadObject(record.S3.Bucket.Name, s3FileName, zipPath)
 					if err != nil {
 						log.Println("error in upload object:", err)
-						continue
+						continue messagesLoop
 					}
 					log.Println("upload object:", zipPathBase)
 					log.Println("object public link:", objPublicLink)
@@ -101,7 +107,7 @@ func main() {
 				snsTopicID, err := sns.Publish(regexp.MustCompile(`[[:punct:]]`).ReplaceAllString(objMetadata.UserEmail, "_"), objPublicLink)
 				if err != nil {
 					log.Println("error in publish sns topic:", err)
-					continue
+					continue messagesLoop
 				}
 
 				log.Println("send sns topic message:", snsTopicID)
