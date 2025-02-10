@@ -65,7 +65,7 @@ func main() {
 				}
 				log.Println("download objects:", strings.TrimPrefix(record.S3.Object.Key, "videos/"))
 
-				if err := request.Post(config.APISrvStatusURL, "application/json", map[string]any{
+				if err := request.Put(config.APISrvStatusURL+"/videos", "application/json", map[string]any{
 					"id":     objMetadata.VideoID,
 					"status": "EM_PROCESSAMENTO",
 				}); err != nil {
@@ -97,7 +97,7 @@ func main() {
 					log.Println("object public link:", objPublicLink)
 				}
 
-				if err := request.Post(config.APISrvStatusURL, "application/json", map[string]any{
+				if err := request.Put(config.APISrvStatusURL+"/videos", "application/json", map[string]any{
 					"id":     objMetadata.VideoID,
 					"status": "FINALIZADO",
 				}); err != nil {
