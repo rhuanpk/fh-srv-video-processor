@@ -55,7 +55,7 @@ func DownloadObjects(bucketName, pathSuffix string) (string, []string, error) {
 	}
 
 	for _, objKey := range objKeys {
-		if !strings.Contains(config.S3VideoExtensions, filepath.Ext(objKey)) {
+		if !strings.Contains(config.VideoExtensions, filepath.Ext(objKey)) {
 			continue
 		}
 

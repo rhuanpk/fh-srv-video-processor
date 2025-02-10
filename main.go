@@ -6,10 +6,12 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"regexp"
 	"time"
 
 	"extractor/internal/config"
 	"extractor/internal/infra/aws/s3"
+	"extractor/internal/infra/aws/sns"
 	"extractor/internal/infra/aws/sqs"
 	video "extractor/internal/resouce/video/handler"
 	zipper "extractor/internal/resouce/zipper/handler"
@@ -17,13 +19,18 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 )
 
-const queueName = "hack-sqs-queue"
-
 func main() {
+	service := video.NewService(zipper.NewService())
+
+	// REMOVE
+	config.AWSRegion = "us-east-1"
+	config.AWSSQSQueueName = "hack-sqs-queue"
+	config.AWSSNSArnPrefix = "arn:aws:sns:us-east-1:086085977965"
+
 	for {
 		log.Println("pulling for aws sqs messages")
 
-		queueURL, messages, err := sqs.ReceiveMessages(queueName)
+		queueURL, messages, err := sqs.ReceiveMessages(config.AWSSQSQueueName)
 		if err != nil {
 			log.Println("error in receive messages:", err)
 		}
@@ -56,13 +63,13 @@ func main() {
 
 				// call srv status antes
 
-				service := video.NewService(zipper.NewService())
 				zipsPaths, err := service.Process(videosPaths, config.FrameInterval, config.FrameHighQuality)
 				if err != nil {
 					log.Println("error in process videos:", err)
 					continue
 				}
 
+				var objPublicLink string
 				for _, zipPath := range zipsPaths {
 					unescapedKey, err := url.PathUnescape(record.S3.Object.Key)
 					if err != nil {
@@ -72,7 +79,7 @@ func main() {
 					zipPathBase := filepath.Base(zipPath)
 					s3FileName := filepath.Join(filepath.Dir(unescapedKey), zipPathBase)
 
-					objPublicLink, err := s3.UploadObject(record.S3.Bucket.Name, s3FileName, zipPath)
+					objPublicLink, err = s3.UploadObject(record.S3.Bucket.Name, s3FileName, zipPath)
 					if err != nil {
 						log.Println("error in upload object:", err)
 						continue
@@ -80,11 +87,12 @@ func main() {
 					log.Println("upload object:", zipPathBase)
 					log.Println("object public link:", objPublicLink)
 				}
+
+				// call srv status depois
+
+				email := regexp.MustCompile(`=(.*)$`).FindStringSubmatch(record.UserIdentity.PrincipalID)[1]
+				sns.Publish(regexp.MustCompile(`[[:punct:]]`).ReplaceAllString(email, "_"), objPublicLink)
 			}
-
-			// call srv status depois
-
-			// call aws sns
 
 			if err := os.RemoveAll(config.ExtractorFolderTmp); err != nil {
 				log.Println("error in remove tmp folder:", err)
