@@ -87,8 +87,8 @@ func DownloadObjects(bucketName, pathSuffix string) (*objectMetadata, []string, 
 	}
 
 	if obj != nil {
-		objectMetadata.UserEmail = obj.Metadata["x-amz-meta-email"]
-		objectMetadata.VideoID = obj.Metadata["x-amz-meta-id"]
+		objectMetadata.UserEmail = obj.Metadata["email"]
+		objectMetadata.VideoID = obj.Metadata["id"]
 	}
 
 	return &objectMetadata, videosPaths, nil
